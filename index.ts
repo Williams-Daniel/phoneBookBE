@@ -10,7 +10,7 @@ const port:string = process.env.PORT!
 const app:Application = express()
 
 appConfig(app)
-const server = app.listen(port,()=>{
+const server = app.listen(process.env.PORT || port,()=>{
     console.log("")
     console.log("A server is running on port: ",port)
     dbConfig()
