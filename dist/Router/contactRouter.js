@@ -14,7 +14,7 @@ router.route("/find-contact-by-favs").get(contactsController_1.findByFavs);
 router.route("/:contactID/find-contact").get(contactsController_1.findOneContact2);
 router.route("/find-contacts").get(contactsController_1.findContacts);
 router.route("/:contactID/delete-contact").delete(contactsController_1.deleteOneContact);
-router.route("/:contactID/update-contact-info").patch(contactsController_1.updateContactInfo);
-router.route("/:contactID/update-contact-avatar").patch(multer_1.default, contactsController_1.updateContactAvatar);
+router.route("/:contactID/update-contact-info").patch(multer_1.default, contactsController_1.updateContactInfo);
+// router.route("/:contactID/update-contact-avatar").patch(upload,updateContactAvatar)
 router.route("/:contactID/add-contact-to-favs").patch(contactsController_1.addContactToFavorites);
 exports.default = router;

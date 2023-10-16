@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addContactToFavorites = exports.updateContactAvatar = exports.updateContactInfo = exports.deleteOneContact = exports.findByFavs = exports.findByLabel = exports.findContacts = exports.findOneContact2 = exports.findOneContact = exports.createNewContact = void 0;
+exports.addContactToFavorites = exports.updateContactInfo = exports.deleteOneContact = exports.findByFavs = exports.findByLabel = exports.findContacts = exports.findOneContact2 = exports.findOneContact = exports.createNewContact = void 0;
 const contactModel_1 = __importDefault(require("../Model/contactModel"));
 const cloudinary_1 = __importDefault(require("../Utils/cloudinary"));
 const createNewContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -138,10 +138,13 @@ exports.deleteOneContact = deleteOneContact;
 const updateContactInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { contactID } = req.params;
-        const { firstName, lastName } = req.body;
+        const { firstName, lastName, avatar } = req.body;
+        const { secure_url, public_id } = yield cloudinary_1.default.uploader.upload(req.file.path);
         const oneContact = yield contactModel_1.default.findByIdAndUpdate(contactID, {
             firstName,
             lastName,
+            avatar: secure_url,
+            avatarID: public_id
         }, { new: true });
         return res.status(201).json({
             message: "Contact has been updated!",
@@ -155,29 +158,35 @@ const updateContactInfo = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.updateContactInfo = updateContactInfo;
-const updateContactAvatar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { contactID } = req.params;
-        // const {avatar} = req.body
-        const { secure_url, public_id } = yield cloudinary_1.default.uploader.upload(req.file.path);
-        const oneContact = yield contactModel_1.default.findByIdAndUpdate(contactID, {
-            avatar: secure_url,
-            avatarID: public_id,
-        }, { new: true });
-        console.log("this is the result: ", oneContact);
-        return res.status(201).json({
-            message: "Contact avatar has been updated!",
-            data: oneContact,
-        });
-    }
-    catch (error) {
-        console.log("this is the error ", error);
-        return res.status(400).json({
-            message: "Contact avatar couldn't be updated!",
-        });
-    }
-});
-exports.updateContactAvatar = updateContactAvatar;
+// export const updateContactAvatar = async (
+//   req: any,
+//   res: Response
+// )=> {
+//   try {
+//     const { contactID } = req.params;
+//     // const {avatar} = req.body
+//     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path);
+//     const oneContact = await contactModel.findByIdAndUpdate(
+//       contactID ,
+//       {
+//         avatar: secure_url,
+//         avatarID: public_id,
+//       },
+//       { new: true }
+//     );
+//     console.log("this is the result: ", oneContact);
+//     return res.status(201).json({
+//       message: "Contact avatar has been updated!",
+//       data: oneContact,
+//     });
+//   } catch (error:any) {
+//     console.log("this is the error ", error.message);
+//     return res.status(400).json({
+//       message: "Contact avatar couldn't be updated!",
+//       error
+//     });
+//   }
+// };
 const addContactToFavorites = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { contactID } = req.params;

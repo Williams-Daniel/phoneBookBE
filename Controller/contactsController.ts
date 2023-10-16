@@ -148,18 +148,20 @@ export const deleteOneContact = async (
 };
 
 export const updateContactInfo = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<Response> => {
   try {
     const { contactID } = req.params;
-    const { firstName, lastName } = req.body;
-
+    const { firstName, lastName,avatar } = req.body;
+    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path);
     const oneContact = await contactModel.findByIdAndUpdate(
       contactID,
       {
         firstName,
         lastName,
+        avatar:secure_url,
+        avatarID:public_id
       },
       { new: true }
     );
@@ -175,36 +177,37 @@ export const updateContactInfo = async (
   }
 };
 
-export const updateContactAvatar = async (
-  req: any,
-  res: Response
-)=> {
-  try {
-    const { contactID } = req.params;
-    // const {avatar} = req.body
-    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path);
+// export const updateContactAvatar = async (
+//   req: any,
+//   res: Response
+// )=> {
+//   try {
+//     const { contactID } = req.params;
+//     // const {avatar} = req.body
+//     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path);
 
-    const oneContact = await contactModel.findByIdAndUpdate(
-      contactID ,
-      {
-        avatar: secure_url,
-        avatarID: public_id,
-      },
-      { new: true }
-    );
+//     const oneContact = await contactModel.findByIdAndUpdate(
+//       contactID ,
+//       {
+//         avatar: secure_url,
+//         avatarID: public_id,
+//       },
+//       { new: true }
+//     );
 
-    console.log("this is the result: ", oneContact);
-    return res.status(201).json({
-      message: "Contact avatar has been updated!",
-      data: oneContact,
-    });
-  } catch (error) {
-    console.log("this is the error ", error);
-    return res.status(400).json({
-      message: "Contact avatar couldn't be updated!",
-    });
-  }
-};
+//     console.log("this is the result: ", oneContact);
+//     return res.status(201).json({
+//       message: "Contact avatar has been updated!",
+//       data: oneContact,
+//     });
+//   } catch (error:any) {
+//     console.log("this is the error ", error.message);
+//     return res.status(400).json({
+//       message: "Contact avatar couldn't be updated!",
+//       error
+//     });
+//   }
+// };
 
 export const addContactToFavorites = async (
   req: Request,
