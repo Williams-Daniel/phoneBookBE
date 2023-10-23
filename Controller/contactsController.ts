@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import contactModel from "../Model/contactModel";
-import { streamUpload } from "../Utils/streamify";
+// import { streamUpload } from "../Utils/streamify";
 import cloudinary from "../Utils/cloudinary";
 
 export const createNewContact = async (
@@ -15,7 +15,6 @@ export const createNewContact = async (
       lastName,
       email,
       phoneNumber,
-      avatar:((firstName.split("")[0].toUpperCase()).concat(lastName.split("")[0].toUpperCase())),
       label:label.toUpperCase(),
       favorite: false
     });
@@ -24,9 +23,10 @@ console.log("newContact",newContact)
       message: "Contact created!",
       data: newContact,
     });
-  } catch (error) {
+  } catch (error:any) {
     return res.status(400).json({
       message: "Contact couldn't be created!",
+      data:error.message
     });
   }
 };
@@ -148,18 +148,21 @@ export const deleteOneContact = async (
 };
 
 export const updateContactInfo = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<Response> => {
   try {
     const { contactID } = req.params;
-    const { firstName, lastName } = req.body;
+    const { firstName, lastName} = req.body;
+    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path);
 
     const oneContact = await contactModel.findByIdAndUpdate(
       contactID,
       {
         firstName,
         lastName,
+        avatar:secure_url,
+        avatarID:public_id
       },
       { new: true }
     );
@@ -175,36 +178,35 @@ export const updateContactInfo = async (
   }
 };
 
-export const updateContactAvatar = async (
-  req: any,
-  res: Response
-)=> {
-  try {
-    const { contactID } = req.params;
-    // const {avatar} = req.body
-    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path);
+// export const updateContactAvatar = async (
+//   req: any,
+//   res: Response
+// )=> {
+//   try {
+//     const { contactID } = req.params;
+//     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path);
 
-    const oneContact = await contactModel.findByIdAndUpdate(
-      contactID ,
-      {
-        avatar: secure_url,
-        avatarID: public_id,
-      },
-      { new: true }
-    );
+//     const oneContact = await contactModel.findByIdAndUpdate(
+//       contactID ,
+//       {
+//         avatar: secure_url,
+//         avatarID: public_id,
+//       },
+//       { new: true }
+//     );
 
-    console.log("this is the result: ", oneContact);
-    return res.status(201).json({
-      message: "Contact avatar has been updated!",
-      data: oneContact,
-    });
-  } catch (error) {
-    console.log("this is the error ", error);
-    return res.status(400).json({
-      message: "Contact avatar couldn't be updated!",
-    });
-  }
-};
+//     // console.log("this is the result: ", oneContact);
+//     return res.status(201).json({
+//       message: "Contact avatar has been updated!",
+//       data: oneContact,
+//     });
+//   } catch (error) {
+//     console.log("this is the error ", error);
+//     return res.status(400).json({
+//       message: "Contact avatar couldn't be updated!",
+//     });
+//   }
+// };
 
 export const addContactToFavorites = async (
   req: Request,
